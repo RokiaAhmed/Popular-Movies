@@ -10,20 +10,17 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 
-import com.google.gson.Gson;
 import com.udacity.popularmovies.data.NetworkUtils;
 import com.udacity.popularmovies.model.Movie;
+import com.udacity.popularmovies.utilities.IntentTools;
 
 import org.json.JSONException;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.Socket;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MoviesAdapter.ListItemClickListener {
 
     RecyclerView mMoviesList;
     MoviesAdapter mAdapter;
@@ -36,9 +33,11 @@ public class MainActivity extends AppCompatActivity {
 
         mProgressbarLoading = findViewById(R.id.progress_bar_loading);
         mMoviesList = findViewById(R.id.rv_movies);
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 3);
         mMoviesList.setLayoutManager(gridLayoutManager);
         mMoviesList.setHasFixedSize(true);
+        mAdapter = new MoviesAdapter( (MoviesAdapter.ListItemClickListener)this);
+        mMoviesList.setAdapter(mAdapter);
 
         mProgressbarLoading.setVisibility(View.VISIBLE);
         new GetMoviesList().execute(NetworkUtils.buildMovieUrl(getString(R.string.popular)));
@@ -56,13 +55,23 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
         if (id == R.id.action_popular) {
             mProgressbarLoading.setVisibility(View.VISIBLE);
+            mMoviesList.setVisibility(View.GONE);
+            setTitle(R.string.popular_title);
             new GetMoviesList().execute(NetworkUtils.buildMovieUrl(getString(R.string.popular)));
             return true;
         } else if (id == R.id.action_top_rated) {
+            mProgressbarLoading.setVisibility(View.VISIBLE);
+            mMoviesList.setVisibility(View.GONE);
+            setTitle(R.string.top_rated_title);
             new GetMoviesList().execute(NetworkUtils.buildMovieUrl(getString(R.string.top_rated)));
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onListItemClick(int clickedItemIndex) {
+        IntentTools.goToMovieDetailsFromItem(this, clickedItemIndex);
     }
 
 
@@ -91,8 +100,7 @@ public class MainActivity extends AppCompatActivity {
 
             if (movieList != null && movieList.size() != 0) {
                 mMoviesList.setVisibility(View.VISIBLE);
-                mAdapter = new MoviesAdapter(movieList);
-                mMoviesList.setAdapter(mAdapter);
+                mAdapter.setList(movieList);
             }
         }
     }

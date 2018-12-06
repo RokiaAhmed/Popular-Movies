@@ -4,5 +4,7 @@
     <string name="top_rated">top_rated</string>
     <string name="popular">popular</string>
     <string name="movie_results">results</string>
-
+    <string name="top_rated_title">Top Rated</string>
+    <string name="popular_title">Popular Movies</string>
+    <string name="key_item_clicked_index">key_index</string>
 </resources>
