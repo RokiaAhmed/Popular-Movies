@@ -36,9 +36,8 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Lis
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 3);
         mMoviesList.setLayoutManager(gridLayoutManager);
         mMoviesList.setHasFixedSize(true);
-        mAdapter = new MoviesAdapter( (MoviesAdapter.ListItemClickListener)this);
+        mAdapter = new MoviesAdapter(this);
         mMoviesList.setAdapter(mAdapter);
-
         mProgressbarLoading.setVisibility(View.VISIBLE);
         new GetMoviesList().execute(NetworkUtils.buildMovieUrl(getString(R.string.popular)));
 
@@ -54,12 +53,16 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Lis
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_popular) {
+            if (item.isChecked()) item.setChecked(false);
+            else item.setChecked(true);
             mProgressbarLoading.setVisibility(View.VISIBLE);
             mMoviesList.setVisibility(View.GONE);
             setTitle(R.string.popular_title);
             new GetMoviesList().execute(NetworkUtils.buildMovieUrl(getString(R.string.popular)));
             return true;
         } else if (id == R.id.action_top_rated) {
+            if (item.isChecked()) item.setChecked(false);
+            else item.setChecked(true);
             mProgressbarLoading.setVisibility(View.VISIBLE);
             mMoviesList.setVisibility(View.GONE);
             setTitle(R.string.top_rated_title);
@@ -100,9 +103,11 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Lis
 
             if (movieList != null && movieList.size() != 0) {
                 mMoviesList.setVisibility(View.VISIBLE);
-                mAdapter.setList(movieList);
+                 mAdapter.setList(movieList);
             }
         }
     }
+
+
 
 }

@@ -24,6 +24,7 @@ class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesViewHolder>
     }
 
     public MoviesAdapter(ListItemClickListener listener) {
+//        mMoviesList = movieList;
         mOnClickListener = listener;
     }
 
@@ -43,7 +44,11 @@ class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesViewHolder>
     @Override
     public void onBindViewHolder(@NonNull MoviesViewHolder holder, int position) {
         String imageUrl = NetworkUtils.buildImageUrl(mMoviesList.get(position).getPoster_path());
-        Picasso.get().load(imageUrl).into(holder.movieImage);
+        Picasso.get()
+                .load(imageUrl)
+                .placeholder(R.drawable.movie_placeholder)
+                .error(R.drawable.movie_placeholder)
+                .into(holder.movieImage);
         holder.movieTitleTextView.setText(mMoviesList.get(position).getTitle());
 
     }
@@ -62,6 +67,7 @@ class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesViewHolder>
             super(itemView);
             movieImage = itemView.findViewById(R.id.image_movie);
             movieTitleTextView = itemView.findViewById(R.id.tv_title);
+            itemView.setOnClickListener(this);
         }
 
         @Override
