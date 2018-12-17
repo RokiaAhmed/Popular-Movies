@@ -9,9 +9,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.udacity.popularmovies.data.NetworkUtils;
 import com.udacity.popularmovies.model.Movie;
+import com.udacity.popularmovies.utilities.ConnectionDetector;
 import com.udacity.popularmovies.utilities.IntentTools;
 
 import org.json.JSONException;
@@ -22,9 +24,12 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements MoviesAdapter.ListItemClickListener {
 
-    RecyclerView mMoviesList;
-    MoviesAdapter mAdapter;
-    ProgressBar mProgressbarLoading;
+    private RecyclerView mMoviesList;
+    private ProgressBar mProgressbarLoading;
+    private TextView noConnectionTextView;
+    private MoviesAdapter mAdapter;
+    private ConnectionDetector connectionDetector;
+    private ArrayList<Movie> movieList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,14 +37,22 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Lis
         setContentView(R.layout.activity_main);
 
         mProgressbarLoading = findViewById(R.id.progress_bar_loading);
+        noConnectionTextView = findViewById(R.id.tv_no_connection);
         mMoviesList = findViewById(R.id.rv_movies);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 3);
         mMoviesList.setLayoutManager(gridLayoutManager);
         mMoviesList.setHasFixedSize(true);
         mAdapter = new MoviesAdapter(this);
         mMoviesList.setAdapter(mAdapter);
-        mProgressbarLoading.setVisibility(View.VISIBLE);
-        new GetMoviesList().execute(NetworkUtils.buildMovieUrl(getString(R.string.popular)));
+        connectionDetector = new ConnectionDetector(this);
+        if (connectionDetector.isConnectingToInternet()) {
+            noConnectionTextView.setVisibility(View.INVISIBLE);
+            mProgressbarLoading.setVisibility(View.VISIBLE);
+            new GetMoviesList().execute(NetworkUtils.buildMovieUrl(getString(R.string.popular)));
+        }else{
+            mProgressbarLoading.setVisibility(View.INVISIBLE);
+            noConnectionTextView.setVisibility(View.VISIBLE);
+        }
 
     }
 
@@ -58,7 +71,14 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Lis
             mProgressbarLoading.setVisibility(View.VISIBLE);
             mMoviesList.setVisibility(View.GONE);
             setTitle(R.string.popular_title);
-            new GetMoviesList().execute(NetworkUtils.buildMovieUrl(getString(R.string.popular)));
+            if (connectionDetector.isConnectingToInternet()) {
+                mProgressbarLoading.setVisibility(View.VISIBLE);
+                noConnectionTextView.setVisibility(View.INVISIBLE);
+                new GetMoviesList().execute(NetworkUtils.buildMovieUrl(getString(R.string.popular)));
+            }else{
+                mProgressbarLoading.setVisibility(View.INVISIBLE);
+                noConnectionTextView.setVisibility(View.VISIBLE);
+            }
             return true;
         } else if (id == R.id.action_top_rated) {
             if (item.isChecked()) item.setChecked(false);
@@ -66,7 +86,14 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Lis
             mProgressbarLoading.setVisibility(View.VISIBLE);
             mMoviesList.setVisibility(View.GONE);
             setTitle(R.string.top_rated_title);
-            new GetMoviesList().execute(NetworkUtils.buildMovieUrl(getString(R.string.top_rated)));
+            if (connectionDetector.isConnectingToInternet()) {
+                mProgressbarLoading.setVisibility(View.VISIBLE);
+                noConnectionTextView.setVisibility(View.INVISIBLE);
+                new GetMoviesList().execute(NetworkUtils.buildMovieUrl(getString(R.string.top_rated)));
+            }else{
+                mProgressbarLoading.setVisibility(View.INVISIBLE);
+                noConnectionTextView.setVisibility(View.VISIBLE);
+            }
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -74,7 +101,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Lis
 
     @Override
     public void onListItemClick(int clickedItemIndex) {
-        IntentTools.goToMovieDetailsFromItem(this, clickedItemIndex);
+        IntentTools.goToMovieDetailsFromItem(this, movieList.get(clickedItemIndex).getId());
     }
 
 
@@ -82,28 +109,29 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Lis
 
         @Override
         protected ArrayList<Movie> doInBackground(URL... params) {
-            URL searchUrl = params[0];
+            URL movieUrl = params[0];
             String moviesJson = null;
-            ArrayList<Movie> moviesList = null;
+            ArrayList<Movie> list = null;
             try {
-                moviesJson = NetworkUtils.getResponseFromHttpUrl(searchUrl);
-                moviesList = NetworkUtils.getArrayFromJson(moviesJson, getString(R.string.movie_results));
+                moviesJson = NetworkUtils.getResponseFromHttpUrl(movieUrl);
+                list = NetworkUtils.getArrayFromJson(moviesJson, getString(R.string.movie_results));
 
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            return moviesList;
+            return list;
         }
 
         @Override
-        protected void onPostExecute(ArrayList<Movie> movieList) {
+        protected void onPostExecute(ArrayList<Movie> list) {
             mProgressbarLoading.setVisibility(View.GONE);
 
-            if (movieList != null && movieList.size() != 0) {
+            if (list != null && list.size() != 0) {
+                movieList = list;
                 mMoviesList.setVisibility(View.VISIBLE);
-                 mAdapter.setList(movieList);
+                 mAdapter.setList(list);
             }
         }
     }

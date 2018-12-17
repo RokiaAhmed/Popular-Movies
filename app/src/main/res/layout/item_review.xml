@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/light_grey"
+    android:layout_marginBottom="10dp">
+
+    <ImageView
+        android:id="@+id/iv_user"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="@drawable/review_user_bg"
+        android:padding="10dp"
+        android:layout_margin="10dp"
+        app:srcCompat="@drawable/ic_person_white"
+        tools:ignore="VectorDrawableCompat" />
+
+    <TextView
+        android:id="@+id/tv_user_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="dfgfgfghhjj"
+        app:layout_constraintStart_toEndOf="@id/iv_user"
+        app:layout_constraintTop_toTopOf="@+id/iv_user"
+        app:layout_constraintBottom_toBottomOf="@+id/iv_user"
+        android:layout_marginStart="10dp"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:id="@+id/tv_content"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text=" After hearing negative reviews from others I was reluctant to see this one at first but I went with my gut feeling and saw it and wow I am so happy I did this movie made my Christmas already it's just what we need in the world today a movie about people putting aside their differences and enjoying just being together"
+        app:layout_constraintTop_toBottomOf="@+id/iv_user"
+        app:layout_constraintStart_toStartOf="@id/iv_user"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_margin="10dp"
+        android:textStyle="bold"/>
+
+</android.support.constraint.ConstraintLayout>

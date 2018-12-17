@@ -19,7 +19,7 @@ public class IntentTools {
         Intent intent = new Intent(context, MovieDetailsActivity.class);
         String key = context.getString(R.string.key_item_clicked_index);
         intent.putExtra(key, index);
-        ((Activity) context).finish();
+//        ((Activity) context).finish();
         context.startActivity(intent);
     }
 

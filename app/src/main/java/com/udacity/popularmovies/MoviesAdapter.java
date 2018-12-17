@@ -43,7 +43,8 @@ class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesViewHolder>
 
     @Override
     public void onBindViewHolder(@NonNull MoviesViewHolder holder, int position) {
-        String imageUrl = NetworkUtils.buildImageUrl(mMoviesList.get(position).getPoster_path());
+        String imageUrl = NetworkUtils.buildImageUrl(mMoviesList.get(position).getPoster_path(),
+                NetworkUtils.IMAGE_SIZE_MAIN);
         Picasso.get()
                 .load(imageUrl)
                 .placeholder(R.drawable.movie_placeholder)
