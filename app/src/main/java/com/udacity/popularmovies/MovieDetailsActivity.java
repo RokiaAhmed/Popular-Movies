@@ -3,6 +3,7 @@ package com.udacity.popularmovies;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,6 +15,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RatingBar;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -22,6 +24,7 @@ import com.udacity.popularmovies.model.Movie;
 import com.udacity.popularmovies.model.MovieReview;
 import com.udacity.popularmovies.model.MovieTrailer;
 import com.udacity.popularmovies.utilities.ConnectionDetector;
+import com.udacity.popularmovies.utilities.IntentTools;
 
 import org.json.JSONException;
 
@@ -31,7 +34,7 @@ import java.util.ArrayList;
 
 
 public class MovieDetailsActivity extends AppCompatActivity
-        implements TrailerAdapter.ListItemClickListener, ReviewsAdapter.ListItemClickListener {
+        implements TrailerAdapter.ListItemClickListener, ReviewsAdapter.ListReviewItemClickListener {
 
     private ConnectionDetector connectionDetector;
     private int movieId;
@@ -45,6 +48,8 @@ public class MovieDetailsActivity extends AppCompatActivity
     private ArrayList<MovieReview> reviewArrayList;
     private TrailerAdapter mTrailerAdapter;
     private ReviewsAdapter mReviewAdapter;
+    private ConstraintLayout containerView;
+    private TextView noConnectionTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,13 +57,15 @@ public class MovieDetailsActivity extends AppCompatActivity
         setContentView(R.layout.activity_movie_details);
 
         if (getIntent() != null) {
-            String key = getString(R.string.key_item_clicked_index);
+            String key = getString(R.string.key_item_id);
             if (getIntent().hasExtra(key)) {
                 movieId = getIntent().getIntExtra(key, -1);
             }
         }
 
+        containerView = findViewById(R.id.container_view);
         mProgressbarLoading = findViewById(R.id.progress_bar_loading);
+        noConnectionTextView = findViewById(R.id.tv_no_connection);
         moviePosterImageView = findViewById(R.id.iv_poster);
         movieTitleTextView = findViewById(R.id.tv_movie_title);
 //        movieReleaseDateTextView = findViewById(R.id.tv_movie_release_date);
@@ -76,9 +83,13 @@ public class MovieDetailsActivity extends AppCompatActivity
         connectionDetector = new ConnectionDetector(this);
         if (connectionDetector.isConnectingToInternet()) {
             mProgressbarLoading.setVisibility(View.VISIBLE);
+            noConnectionTextView.setVisibility(View.GONE);
             new GetMovie().execute(NetworkUtils.buildMovieDetailsUrl(movieId));
             new GetMovieTrailer().execute(NetworkUtils.buildMovieTrailerUrl(movieId));
             new GetMovieReviews().execute(NetworkUtils.buildMovieReviewUrl(movieId));
+        }else {
+            noConnectionTextView.setVisibility(View.VISIBLE);
+            mProgressbarLoading.setVisibility(View.GONE);
         }
 
     }
@@ -91,6 +102,10 @@ public class MovieDetailsActivity extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -102,7 +117,7 @@ public class MovieDetailsActivity extends AppCompatActivity
                 .error(R.drawable.movie_placeholder)
                 .into(moviePosterImageView);
         String[] date = movie.getRelease_date().split("-");
-        movieTitleTextView.setText(movie.getTitle() + " (" + date[0] + ")");
+        movieTitleTextView.setText(movie.getOriginal_title() + " (" + date[0] + ")");
 //        movieReleaseDateTextView.setText(movie.getRelease_date());
         voteAverageRatingBar.setRating((movie.getVote_average() * 5) / 10);
         overviewTextView.setText(movie.getOverview());
@@ -110,8 +125,31 @@ public class MovieDetailsActivity extends AppCompatActivity
 
     private void prepareTabs() {
         tableLayout = findViewById(R.id.tab_details);
-        tableLayout.addTab(tableLayout.newTab().setText( R.string.trailer));
-        tableLayout.addTab(tableLayout.newTab().setText( R.string.reviews));
+        tableLayout.addTab(tableLayout.newTab().setText(R.string.trailer));
+        tableLayout.addTab(tableLayout.newTab().setText(R.string.reviews));
+        tableLayout.addOnTabSelectedListener(new TabLayout.BaseOnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                String tabName = tab.getText().toString();
+                if (tabName.equals(getString(R.string.trailer))){
+                    mReviewList.setVisibility(View.GONE);
+                    mTrailerList.setVisibility(View.VISIBLE);
+                }else {
+                    mReviewList.setVisibility(View.VISIBLE);
+                    mTrailerList.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
     }
 
     private void populateTrailerUI(ArrayList<MovieTrailer> trailerList) {
@@ -123,7 +161,7 @@ public class MovieDetailsActivity extends AppCompatActivity
     private void populateReviewUI(ArrayList<MovieReview> reviewList) {
         reviewArrayList = reviewList;
         mReviewAdapter = new ReviewsAdapter(reviewArrayList, this);
-        mTrailerList.setAdapter(mReviewAdapter);
+        mReviewList.setAdapter(mReviewAdapter);
     }
 
 
@@ -133,6 +171,11 @@ public class MovieDetailsActivity extends AppCompatActivity
                 + trailerArrayList.get(clickedItemIndex).getKey()
                 + "\"")));
 
+    }
+
+    @Override
+    public void onListReviewItemClick(int clickedItemIndex) {
+        IntentTools.goToReviewDetailsFromItem(this, clickedItemIndex);
     }
 
     class GetMovie extends AsyncTask<URL, Void, Movie> {
@@ -157,6 +200,8 @@ public class MovieDetailsActivity extends AppCompatActivity
         @Override
         protected void onPostExecute(Movie movie) {
             mProgressbarLoading.setVisibility(View.GONE);
+            containerView.setVisibility(View.VISIBLE);
+
             if (movie != null) {
                 populateUI(movie);
             }
@@ -216,8 +261,6 @@ public class MovieDetailsActivity extends AppCompatActivity
             }
         }
     }
-
-
 
 
 }

@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.udacity.popularmovies.data.NetworkUtils;
 import com.udacity.popularmovies.model.Movie;
@@ -66,35 +67,13 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Lis
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_popular) {
-            if (item.isChecked()) item.setChecked(false);
-            else item.setChecked(true);
-            mProgressbarLoading.setVisibility(View.VISIBLE);
-            mMoviesList.setVisibility(View.GONE);
-            setTitle(R.string.popular_title);
-            if (connectionDetector.isConnectingToInternet()) {
-                mProgressbarLoading.setVisibility(View.VISIBLE);
-                noConnectionTextView.setVisibility(View.INVISIBLE);
-                new GetMoviesList().execute(NetworkUtils.buildMovieUrl(getString(R.string.popular)));
-            }else{
-                mProgressbarLoading.setVisibility(View.INVISIBLE);
-                noConnectionTextView.setVisibility(View.VISIBLE);
-            }
+           preparePopularMovies(item);
             return true;
         } else if (id == R.id.action_top_rated) {
-            if (item.isChecked()) item.setChecked(false);
-            else item.setChecked(true);
-            mProgressbarLoading.setVisibility(View.VISIBLE);
-            mMoviesList.setVisibility(View.GONE);
-            setTitle(R.string.top_rated_title);
-            if (connectionDetector.isConnectingToInternet()) {
-                mProgressbarLoading.setVisibility(View.VISIBLE);
-                noConnectionTextView.setVisibility(View.INVISIBLE);
-                new GetMoviesList().execute(NetworkUtils.buildMovieUrl(getString(R.string.top_rated)));
-            }else{
-                mProgressbarLoading.setVisibility(View.INVISIBLE);
-                noConnectionTextView.setVisibility(View.VISIBLE);
-            }
+            prepareTopMovies(item);
             return true;
+        }else if (id == R.id.action_favourite){
+           prepareFavouriteMovies(item);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -102,6 +81,46 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Lis
     @Override
     public void onListItemClick(int clickedItemIndex) {
         IntentTools.goToMovieDetailsFromItem(this, movieList.get(clickedItemIndex).getId());
+    }
+
+    private void preparePopularMovies(MenuItem item){
+        if (item.isChecked()) item.setChecked(false);
+        else item.setChecked(true);
+        mProgressbarLoading.setVisibility(View.VISIBLE);
+        mMoviesList.setVisibility(View.GONE);
+        setTitle(R.string.popular_title);
+        if (connectionDetector.isConnectingToInternet()) {
+            mProgressbarLoading.setVisibility(View.VISIBLE);
+            noConnectionTextView.setVisibility(View.INVISIBLE);
+            new GetMoviesList().execute(NetworkUtils.buildMovieUrl(getString(R.string.popular)));
+        }else{
+            mProgressbarLoading.setVisibility(View.INVISIBLE);
+            noConnectionTextView.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void prepareTopMovies(MenuItem item){
+        if (item.isChecked()) item.setChecked(false);
+        else item.setChecked(true);
+        mProgressbarLoading.setVisibility(View.VISIBLE);
+        mMoviesList.setVisibility(View.GONE);
+        setTitle(R.string.top_rated_title);
+        if (connectionDetector.isConnectingToInternet()) {
+            mProgressbarLoading.setVisibility(View.VISIBLE);
+            noConnectionTextView.setVisibility(View.INVISIBLE);
+            new GetMoviesList().execute(NetworkUtils.buildMovieUrl(getString(R.string.top_rated)));
+        }else{
+            mProgressbarLoading.setVisibility(View.INVISIBLE);
+            noConnectionTextView.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void prepareFavouriteMovies(MenuItem item){
+        if (item.isChecked()) item.setChecked(false);
+        else item.setChecked(true);
+        setTitle(R.string.favourite_title);
+        ArrayList<Movie> list= new ArrayList<>();
+        mAdapter.setList(list);
     }
 
 

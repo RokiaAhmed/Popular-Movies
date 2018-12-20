@@ -14,13 +14,13 @@ import java.util.ArrayList;
 class ReviewsAdapter extends RecyclerView.Adapter<ReviewsAdapter.ReviewsViewHolder> {
 
     ArrayList<MovieReview> mReviewList;
-    final private ListItemClickListener mOnClickListener;
+    final private ListReviewItemClickListener mOnClickListener;
 
-    public interface ListItemClickListener {
-        void onListItemClick(int clickedItemIndex);
+    public interface ListReviewItemClickListener {
+        void onListReviewItemClick(int clickedItemIndex);
     }
 
-    public ReviewsAdapter(ArrayList list, ListItemClickListener listener) {
+    public ReviewsAdapter(ArrayList list, ListReviewItemClickListener listener) {
         mReviewList = list;
         mOnClickListener = listener;
     }
@@ -59,7 +59,7 @@ class ReviewsAdapter extends RecyclerView.Adapter<ReviewsAdapter.ReviewsViewHold
         @Override
         public void onClick(View v) {
             int clickedPosition = getAdapterPosition();
-            mOnClickListener.onListItemClick(clickedPosition);
+            mOnClickListener.onListReviewItemClick(clickedPosition);
         }
     }
 }

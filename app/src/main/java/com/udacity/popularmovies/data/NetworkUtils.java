@@ -140,7 +140,7 @@ public class NetworkUtils {
     public static Movie getMovie(String json) throws JSONException {
         JSONObject jsonObject = new JSONObject(json);
         Movie movie = new Movie();
-        movie.setTitle(jsonObject.getString("title"));
+        movie.setOriginal_title(jsonObject.getString("original_title"));
         movie.setRelease_date(jsonObject.getString("release_date"));
         movie.setPoster_path(jsonObject.getString("poster_path"));
         movie.setVote_average((float) jsonObject.getDouble("vote_average"));

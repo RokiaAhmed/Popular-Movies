@@ -2,11 +2,13 @@
     <string name="app_name">Popular Movies</string>
     <string name="movie_item_description">movie item description</string>
     <string name="top_rated">top_rated</string>
+    <string name="favourite">Favourites</string>
     <string name="popular">popular</string>
     <string name="movie_results">results</string>
     <string name="top_rated_title">Top Rated</string>
     <string name="popular_title">Popular Movies</string>
-    <string name="key_item_clicked_index">key_index</string>
+    <string name="favourite_title">Favourites Movies</string>
+    <string name="key_item_id">key_index</string>
     <string name="no_connection">No Internet Connection</string>
     <string name="overview">Overview: </string>
     <string name="trailer">Trailer</string>
