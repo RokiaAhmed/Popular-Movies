@@ -23,7 +23,7 @@ import java.util.Scanner;
 public class NetworkUtils {
 
     final static String BASE_URL = "https://api.themoviedb.org/3/movie/";
-    final static String API_KEY = "a56da9e6508fd2a64c867e76282ed9a5";
+    final static String API_KEY = "";
     final static String LANGUAGE = "en-US";
 
 
